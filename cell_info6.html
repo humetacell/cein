@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>휴메타셀 보유 세포주 정보</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+        header {
+            background-color: #0073e6;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .search-bar {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .search-bar input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            background-color: #0073e6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #005bb5;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            background: white;
+            border: 1px solid #f7f9fc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .result-item h2 {
+            color: #0073e6;
+        }
+        .result-item table {
+            width: 60%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin: 0 auto;
+        }
+        .result-item table th, .result-item table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .result-item table th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .no-results {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>휴메타셀 보유 세포주 정보</h1>
+    </header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="세포주 이름을 검색하세요...">
+            <button onclick="performSearch()">검색</button>
+        </div>
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        let data = [];
+
+        // CSV 파일 로드 함수
+       function loadCSV() {
+    fetch('https://4c988b93-633b-4930-b39c-4d6e03445b93.usrfiles.com/ugd/4c988b_5654a587071d4fc28556f7027feaaed5.csv')
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.text();
+        })
+        .then(text => {
+            const rows = text.split('\n').slice(1).filter(row => row.trim() !== ''); // 빈 줄 제거
+            data = rows.map(row => {
+                const cols = row.split(',');
+                return {
+                    Name: cols[0] || 'N/A',
+                    Biosafety: cols[1] || 'N/A',
+                    "Product Category": cols[2] || 'N/A',
+                    "Product type": cols[3] || 'N/A',
+                    Organism: cols[4] || 'N/A',
+                    "Cell type": cols[5] || 'N/A',
+                    morphology: cols[6] || 'N/A',
+                    Tissue: cols[7] || 'N/A',
+                    Disease: cols[8] || 'N/A',
+                    "Insert gene": cols[9] || 'N/A',
+                    Image: cols[10] || ''
+                };
+            });
+            console.log('CSV loaded successfully:', data); // 디버깅용
+        })
+        .catch(error => {
+            console.error('Error loading CSV:', error);
+        });
+}
+
+        function performSearch() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            const filteredResults = data.filter(item =>
+                item.Name.toLowerCase().includes(input) || 
+                item.Disease.toLowerCase().includes(input)
+            );
+
+            if (filteredResults.length === 0) {
+                resultsContainer.innerHTML = `<p class="no-results">"${input}"에 대한 결과가 없습니다.</p>`;
+            } else {
+                filteredResults.forEach(item => {
+                    const resultDiv = document.createElement('div');
+                    resultDiv.classList.add('result-item');
+                    let tableRows = '';
+
+                    for (const key in item) {
+                        if (key === 'Image' && item[key]) {
+                            tableRows += `
+                                <tr>
+                                    <th>${key}</th>
+                                    <td><img src="${item[key]}" alt="${item.Name}"></td>
+                                </tr>
+                            `;
+                        } else {
+                            tableRows += `<tr><th>${key}</th><td>${item[key]}</td></tr>`;
+                        }
+                    }
+
+                    resultDiv.innerHTML = `
+                        <h2>${item.Name}</h2>
+                        <table>${tableRows}</table>
+                    `;
+                    resultsContainer.appendChild(resultDiv);
+                });
+            }
+        }
+
+        // 페이지 로드 시 CSV 파일 불러오기
+        loadCSV();
+    </script>
+</body>
+</html>
