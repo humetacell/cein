@@ -97,7 +97,7 @@
 
     <div class="container">
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="세포주 이름을 검색하세요...">
+            <input type="text" id="searchInput" placeholder="Lot 번호 또는 세포주 이름을 입력하세요...">
             <button onclick="performSearch()">검색</button>
         </div>
         <div class="results" id="results"></div>
@@ -108,7 +108,7 @@
 
         // CSV 파일 로드 함수
        function loadCSV() {
-    fetch('https://4c988b93-633b-4930-b39c-4d6e03445b93.usrfiles.com/ugd/4c988b_5654a587071d4fc28556f7027feaaed5.csv')
+    fetch('https://4c988b93-633b-4930-b39c-4d6e03445b93.usrfiles.com/ugd/4c988b_1935f6a45ad84acdb2c0c25bc1bffbe9.csv')
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
             return response.text();
@@ -118,17 +118,18 @@
             data = rows.map(row => {
                 const cols = row.split(',');
                 return {
-                    Name: cols[0] || 'N/A',
-                    Biosafety: cols[1] || 'N/A',
-                    "Product Category": cols[2] || 'N/A',
-                    "Product type": cols[3] || 'N/A',
-                    Organism: cols[4] || 'N/A',
-                    "Cell type": cols[5] || 'N/A',
-                    morphology: cols[6] || 'N/A',
-                    Tissue: cols[7] || 'N/A',
-                    Disease: cols[8] || 'N/A',
-                    "Insert gene": cols[9] || 'N/A',
-                    Image: cols[10] || ''
+                    Lot: cols[0] || 'N/A',
+                    Name: cols[1] || 'N/A',
+                    Biosafety: cols[2] || 'N/A',
+                    "Product Category": cols[3] || 'N/A',
+                    "Product type": cols[4] || 'N/A',
+                    Organism: cols[5] || 'N/A',
+                    "Cell type": cols[6] || 'N/A',
+                    morphology: cols[7] || 'N/A',
+                    Tissue: cols[8] || 'N/A',
+                    Disease: cols[9] || 'N/A',
+                    "Insert gene": cols[10] || 'N/A',
+                    Image: cols[11] || ''
                 };
             });
             console.log('CSV loaded successfully:', data); // 디버깅용
@@ -144,8 +145,8 @@
             resultsContainer.innerHTML = '';
 
             const filteredResults = data.filter(item =>
-                item.Name.toLowerCase().includes(input) || 
-                item.Disease.toLowerCase().includes(input)
+                item.Lot.toLowerCase().includes(input) || 
+                item.Name.toLowerCase().includes(input)
             );
 
             if (filteredResults.length === 0) {
@@ -161,7 +162,7 @@
                             tableRows += `
                                 <tr>
                                     <th>${key}</th>
-                                    <td><img src="${item[key]}" alt="${item.Name}"></td>
+                                    <td><img src="${item[key]}" alt="${item.Lot}"></td>
                                 </tr>
                             `;
                         } else {
